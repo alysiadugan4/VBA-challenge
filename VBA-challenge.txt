@@ -1,0 +1,112 @@
+Sub StockHomework()
+
+Dim Ticker As Integer
+Dim TotalVolume As Double
+Dim OpeningPrice As Double
+Dim ClosingPrice As Double
+Dim AnnualChange As Double
+Dim PercentageChange As Variant
+Dim MaxVolume As Double
+Dim MaxPerIncrease As Double
+Dim MinPerIncrease As Variant
+
+
+For Each ws In Worksheets
+
+    ws.Cells(1, 10).Value = "Ticker"
+    ws.Cells(1, 11).Value = "Yearly Change"
+    ws.Cells(1, 12).Value = "Percent Change"
+    ws.Cells(1, 13).Value = "Total Stock Volume"
+    ws.Cells(2, 15).Value = "Greatest % Increase"
+    ws.Cells(3, 15).Value = "Greatest % Decrease"
+    ws.Cells(4, 15).Value = "Greatest Total Volume"
+    ws.Cells(1, 16).Value = "Ticker"
+    ws.Cells(1, 17).Value = "Value"
+    
+Ticker = 2
+TotalVolume = 0
+OpeningPrice = ws.Cells(2, 3).Value
+ClosingPrice = 0
+AnnualChange = 0
+PercentageChange = 0
+MaxVolume = 0
+MaxVolumeTicker = ""
+MaxPerIncrease = 0
+MaxPerTicker = ""
+MinPerIncrease = 999999999
+MinPerTicker = ""
+
+lastrow = ws.Cells(Rows.Count, 1).End(xlUp).Row
+
+    For i = 2 To lastrow
+    
+        TotalVolume = TotalVolume + ws.Cells(i, 7).Value
+    
+        If ws.Cells(i, 1).Value <> ws.Cells(i + 1, 1).Value Then
+            
+            ws.Cells(Ticker, 10).Value = ws.Cells(i, 1).Value
+            ws.Cells(Ticker, 13).Value = TotalVolume
+            
+            ClosingPrice = ws.Cells(i, 6).Value
+            AnnualChange = ClosingPrice - OpeningPrice
+            ws.Cells(Ticker, 11).Value = AnnualChange
+            
+            If ws.Cells(Ticker, 11).Value < 0 Then
+                ws.Cells(Ticker, 11).Interior.ColorIndex = 3
+                
+            Else
+                ws.Cells(Ticker, 11).Interior.ColorIndex = 4
+                
+            End If
+            
+            If OpeningPrice > 0 Then
+            
+                PercentageChange = AnnualChange / OpeningPrice
+                
+            
+            Else
+                PercentageChange = 0
+                
+            End If
+                
+            ws.Cells(Ticker, 12).Value = PercentageChange
+            ws.Cells(Ticker, 12).NumberFormat = "0.00%"
+            
+            OpeningPrice = ws.Cells(i + 1, 3).Value
+            
+            If TotalVolume > MaxVolume Then
+                MaxVolume = TotalVolume
+                MaxVolumeTicker = ws.Cells(i, 1).Value
+                ws.Cells(4, 16) = MaxVolumeTicker
+                ws.Cells(4, 17) = MaxVolume
+            End If
+            
+            If PercentageChange > MaxPerIncrease Then
+                MaxPerIncrease = PercentageChange
+                MaxPerTicker = ws.Cells(i, 1).Value
+                ws.Cells(2, 16) = MaxPerTicker
+                ws.Cells(2, 17) = MaxPerIncrease
+                ws.Cells(2, 17).NumberFormat = "0.00%"
+            End If
+            
+            If PercentageChange < MinPerIncrease Then
+                MinPerIncrease = PercentageChange
+                MinPerTicker = ws.Cells(i, 1).Value
+                ws.Cells(3, 16) = MinPerTicker
+                ws.Cells(3, 17) = MinPerIncrease
+                ws.Cells(3, 17).NumberFormat = "0.00%"
+            End If
+            
+            TotalVolume = 0
+            Ticker = Ticker + 1
+        
+           
+        End If
+    
+    Next i
+    
+    
+
+Next ws
+
+End Sub
